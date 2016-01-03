@@ -18,7 +18,7 @@ struct BINARYTREES {
 };
 
 char* GetString(FILE *in);
-void FindNode(btree_t *node, char *string, int index);
+void FindNode(btree_t *node, char *string, int index, size_t length);
 void CreateNode(btree_t *node, char *in);
 void PrintTree(btree_t *node);
 
@@ -29,7 +29,7 @@ int main (int argc, char* argv[]){
 	btree_t *tree = NULL;
 	/* get string */
 	char* string = GetString(stdin);
-	int stringlength = strlen(string);
+	size_t stringlength = strlen(string);
 	int index = 1;
 	tree = malloc(sizeof(btree_t));
 	assert(tree != NULL);
@@ -38,7 +38,7 @@ int main (int argc, char* argv[]){
 	//fprintf(stderr, "output:%c\n", string[stringlength - 1]);
 	tree->output = &string[stringlength - 1];
 	while(index < stringlength){
-		FindNode(tree, string, index);
+		FindNode(tree, string, index, stringlength);
 		index++;
 	}
 	PrintTree(tree);
@@ -60,12 +60,12 @@ void PrintTree(btree_t *node){
 	return;
 }
 
-void FindNode(btree_t *node, char *string, int index){
+void FindNode(btree_t *node, char *string, int index, size_t length){
 	TEMP++;
 	//fprintf(stderr, "finding node location for %c\n", string[index]);
 	int i = 0, j = 0;
 	int is_found = 0;
-	int stringlength = strlen(string);
+	int stringlength = length;
 	while(is_found == 0){
 		//fprintf(stderr, "comparing %c with %c\n", node->entry[j], string[index+i]);
 		//continous comparison to find lexicographic ordering
@@ -84,7 +84,7 @@ void FindNode(btree_t *node, char *string, int index){
 				}
 			} 
 			else {
-				FindNode(node->left, string, index);
+				FindNode(node->left, string, index, length);
 			}
 			return;
 		}
@@ -103,7 +103,7 @@ void FindNode(btree_t *node, char *string, int index){
 				}
 			}
 			else {
-				FindNode(node->right, string, index);
+				FindNode(node->right, string, index, length);
 			}
 			return;
 
