@@ -83,8 +83,20 @@ int main(int argc, char* argv[]){
 		index++;
 	}
 	//print EOF index
-	fprintf(stdout, "%u", TEMP);
 	fprintf(stderr, "COUNTER == %d\n", TEMP);
+	int x = 0;
+	unsigned char *c = malloc(sizeof(char) * 4);
+	while(x < 4){
+		c[3-x] = (unsigned char)TEMP;
+		TEMP >>= 8;
+		x++;
+	}
+	x = 0;
+	//temporary makeshift way to print int in the right order as raw char
+	while(x < 4){
+		fprintf(stdout, "%c", c[x]);
+		x++;
+	}
 	return 0;
 }
 
