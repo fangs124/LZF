@@ -82,6 +82,8 @@ int main(int argc, char* argv[]){
 		}
 		index++;
 	}
+	//print EOF index
+	fprintf(stdout, "%u", TEMP);
 	fprintf(stderr, "COUNTER == %d\n", TEMP);
 	return 0;
 }
