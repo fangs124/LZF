@@ -166,6 +166,7 @@ void CreateNode(btree_t *node, string_t *string, int index){
 	return;
 }
 
+//--------------------------------------------------------------------------//
 
 string_t GetString(FILE *in){
 	#if DEBUG
