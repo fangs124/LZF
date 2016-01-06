@@ -23,6 +23,12 @@ struct NODES {
 	node_t* right; 
 };
 
+typedef struct LISTS list_t;
+struct LISTS{
+	unsigned char data;
+	unsigned int index;
+};
+
 typedef struct STRINGS string_t;
 struct STRINGS {
 	unsigned char* chars;
@@ -34,7 +40,14 @@ struct STRINGS {
 string_t GetString(FILE *in);
 node_t* InsertNode(node_t* node, unsigned char c, unsigned int index);
 void CreateNode(node_t* node, unsigned char c, unsigned int index);
-unsigned int PrintNode(node_t* node, unsigned int index);
+void CreateList(node_t* node, unsigned int size);
+void PrintNode(node_t* node);
+//unsigned int PrintNode(node_t* node, unsigned int index);
+
+//--------// global variables //-------------------------------------------//
+
+list_t *LIST;
+unsigned int LIST_INDEX = 0;
 
 //--------------------------------------------------------------------------//
 
@@ -69,13 +82,18 @@ int main(int argc, char* argv[]){
 		tree = InsertNode(tree, string.chars[x], x);
 		x++;
 	}
+
+	CreateList(tree, string.length);
+
+	
 	// print result
 	unsigned int printed_char = 0;
 	while(printed_char < string.length){
 		#if DEBUG
 		fprintf(stderr, "key = %X\n", key);
 		#endif
-		key = PrintNode(tree, key);
+		fprintf(stdout, "%c", LIST[key].data);
+		key = LIST[key].index;
 		printed_char++;
 	}
 	return 0;
@@ -168,29 +186,51 @@ void CreateNode(node_t* node, unsigned char c, unsigned int index){
 
 //returns next key to be printed out
 //index is the ith element on the tree
-unsigned int PrintNode(node_t* node, unsigned int index){
-	#if DEBUG
-	fprintf(stderr, "current node->data = %c\n", node->data);
-	fprintf(stderr, "index = %X\n", index);
-	#endif
+//unsigned int PrintNode(node_t* node, unsigned int index){
+//	#if DEBUG
+//	fprintf(stderr, "current node->data = %c\n", node->data);
+//	fprintf(stderr, "index = %X\n", index);
+//	#endif
+//
+//
+//	/* if node is found */
+//	if(node->left_nodes == index){
+//		/* print data and return next key index */
+//		fprintf(stdout, "%c", node->data);
+//		return node->index;
+//	}
+//	else if(node->left_nodes > index){
+//		return PrintNode(node->left, index);
+//	}
+//	else {
+//		return PrintNode(node->right, (index - node->left_nodes - 1));
+//	}
+//	/* if code reach here, something went horribly wrong */
+//	return 0;
+//}
 
-
-	/* if node is found */
-	if(node->left_nodes == index){
-		/* print data and return next key index */
-		fprintf(stdout, "%c", node->data);
-		return node->index;
-	}
-	else if(node->left_nodes > index){
-		return PrintNode(node->left, index);
-	}
-	else {
-		return PrintNode(node->right, (index - node->left_nodes - 1));
-	}
-	/* if code reach here, something went horribly wrong */
-	return 0;
+void CreateList(node_t* node, unsigned int size){
+	LIST = malloc(sizeof(list_t) * size);
+	assert(LIST != NULL);
+	PrintNode(node);
+	return;
 }
 
+void PrintNode(node_t* node){
+	/* append smallest node */
+	if(node->left != NULL){
+		PrintNode(node->left);
+	}
+
+	LIST[LIST_INDEX].data = node->data;
+	LIST[LIST_INDEX].index = node->index;
+	LIST_INDEX++;
+
+	if(node->right != NULL){
+		PrintNode(node->right);
+	}
+	return;
+}
 
 
 
