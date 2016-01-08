@@ -154,13 +154,13 @@ node_t* InsertNode(node_t* node, unsigned char c, unsigned int index){
 
 	else{
 		/* compare chars */
-		if((unsigned int) node->data > (unsigned int) c){
+		if((int) node->data >(int) c){
 			/* go to the left branch */
 			node->left_nodes++;
 			node->left = InsertNode(node->left, c, index);
 			return node;
 		}
-		else if((unsigned int) node->data <= (unsigned int) c){
+		else if((int) node->data <= (int) c){
 			node->right = InsertNode(node->right, c, index);
 			return node;
 		}
