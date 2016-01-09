@@ -1,21 +1,14 @@
 /* BWTe.c - Burrows Wheeler Transform Decoder */
-/* NAME: Fangs124                             */
-/* VERS: 0.2a                                 */
-/* DATE: 8 January, 2016                      */
+/* AUTHORS: Fangs124, darkf                   */
 
-//--------//  preprocessors //----------------------------------------------//
+#include <cstdio>
+#include <cstdlib>
+#include <cassert>
+#include <cstring>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <string.h>
-
-typedef struct STRINGS string_t;
-struct STRINGS {
-	unsigned char* chars;
-	size_t key;
-	size_t length; // location of terminating null-byte ('\0')
-};
+#include <string>
+#include <iostream>
+#include <sstream>
 
 typedef struct NODES node_t;
 struct NODES {
@@ -31,18 +24,44 @@ struct BUCKETS {
 	node_t* childs;
 };
 
-string_t GetString(FILE *in);
+std::string readFile(std::istream& is, size_t& key) {
+	is.seekg(0, is.end);
+	size_t filesize = is.tellg();
+	is.seekg(0, is.beg);
+
+	std::string s;
+	s.resize(filesize - 8);
+	is.read(&s[0], filesize - 8);
+	assert((bool)is);
+
+    std::string keybuf;
+    keybuf.resize(8);
+    is.read(&keybuf[0], 8);
+	assert((bool)is);
+
+    key = 0;
+    for(int i = 0; i < 8; i++) {
+    	key <<= 8;
+    	key |= (unsigned char)keybuf[i];
+    }
+
+    std::cout << "key: " << key << std::endl;
+
+    return s;
+}
+
 
 int main() {
-	/* get string from stdin */
-	string_t string = GetString(stdin);
+	size_t key;
+	std::string string = readFile(std::cin, key);
 	// fprintf(stderr, "%zu\n", string.length);
 	// fprintf(stderr, "%zX\n", string.key);
 
 	/* initialize buckets */
 	bucket_t root[256];
-	size_t index = 0x00;
-	while(index <= 0xFF){
+	size_t index = 0;
+
+	while(index <= 255) {
 		root[index].child_count = 0;
 		root[index].size = 2;
 		root[index].childs = (node_t *)malloc(sizeof(node_t) * root[index].size);
@@ -51,11 +70,12 @@ int main() {
 	}
 
 	/* bucket sort */
-	index = 0x00;
+	index = 0;
 	unsigned char c;
-	while(index < string.length){
-		c = string.chars[index];
-		root[c].childs[root[c].child_count].data = &string.chars[index];
+
+	while(index < string.size()) {
+		c = string[index];
+		root[c].childs[root[c].child_count].data = (unsigned char*) &string[index];
 		root[c].childs[root[c].child_count].index = index;
 		//root[c].childs[root[c].child_count].next = NULL;
 		root[c].child_count++;
@@ -68,14 +88,14 @@ int main() {
 		index++;
 	}
 
-	index = 0x00;
-	size_t key = string.key;
-	while(index < string.length){
-		c = 0x00;
+	index = 0;
+	while(index < string.size()) {
+		c = 0;
 		while(key + 1 > root[c].child_count){
 			key -= root[c].child_count;
 			c++;
 		}
+
 		//fprintf(stderr, "%X\n", key);
 		fprintf(stdout, "%c", *root[c].childs[key].data);
 		key = root[c].childs[key].index;
@@ -83,61 +103,7 @@ int main() {
 		index++;
 	}
 
-
 	//fprintf(stderr, "size_t = %zu\n", sizeof(size_t));
 	//fprintf(stderr, "unsigned int = %zu\n", sizeof(unsigned int));
 	return 0;
 }
-
-string_t GetString(FILE *in){
-	#if DEBUG
-	fprintf(stderr, "retrieving string: ");
-	#endif
-
-	/* initialize memory space for c */	
-	size_t size = sizeof(char);
-	unsigned char *c = (unsigned char *) malloc(size);
-	assert(c != NULL);
-
-	/* retrieve char to buffer from in */
-	size_t i = 0;
-	int buffer;
-
-	while((buffer = fgetc(in)) != EOF){
-		c[i] = (unsigned char) buffer;
-		i++;
-
-		/* extend c if needed */
-		if(size == i){
-			size *= 2;
-			c = (unsigned char *)realloc(c, size);
-			assert(c != NULL);
-		}
-	}
-	/* retrieving key */
-	int x = 8;
-	unsigned char byteblock;
-	size_t key;
-	while(x > 0){
-		byteblock = c[i - x];
-		key <<= 8;
-		key = (key | byteblock);
-		x--;
-	}
-	/* trimming memory space for c */
-	c = (unsigned char *)realloc(c, (sizeof(char)*(i - 7)));
-	c[i - 7] = '\0';
-
-	#if DEBUG
-	fprintf(stderr, "%s\nlength = %d\n------\n", c, i);
-	#endif
-
-	/* creating string and returns */
-	string_t string;
-	string.key = key;
-	string.chars = c;
-	string.length = i - 8;
-	return string;
-}
-
-
