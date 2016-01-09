@@ -19,9 +19,9 @@
 
 typedef struct BINARYTREES btree_t;
 struct BINARYTREES {
-	char *entry;
-	unsigned int entryindex;
-	char *output;
+	unsigned char *entry;
+	size_t entryindex;
+	unsigned char *output;
 	btree_t *left;
 	btree_t *right;
 };
@@ -34,29 +34,29 @@ struct ROOTS {
 
 typedef struct STRINGS string_t;
 struct STRINGS {
-	char* chars;
+	unsigned char* chars;
 	size_t length; //location of terminating null-byte ('\0')
 };
 
 //--------// function prototypes //-----------------------------------------//
 
-btree_t *InsertNode(btree_t *node, string_t *string, int index);
-void CreateNode(btree_t *node, string_t *string, int index);
+btree_t *InsertNode(btree_t *node, string_t *string, size_t index);
+void CreateNode(btree_t *node, string_t *string, size_t index);
 void PrintTree(btree_t *node);
 string_t GetString(FILE *in);
 
 //--------// global variables //-------------------------------------------//
 
-unsigned int EOF_INDEX;
-unsigned int COUNTER;
-unsigned int TEMP;
+size_t EOF_INDEX;
+size_t COUNTER;
+size_t KEY;
 
 //--------------------------------------------------------------------------//
 
 int main(int argc, char* argv[]){
 	/* initializing root nodes */
 	root_t rootnodes[256];
-	int index = 0x00;
+	size_t index = 0x00;
 	while(index <= 0xFF){
 		rootnodes[index].value = (unsigned char) index;
 		rootnodes[index].node = NULL;
@@ -66,7 +66,7 @@ int main(int argc, char* argv[]){
 	/* retrieve string */
 	string_t string = GetString(stdin);
 
-	int i = 0;
+	size_t i = 0;
 	/* insert char into binary tree */
 	while(i < string.length){
 		index = (unsigned char) string.chars[i];
@@ -82,17 +82,17 @@ int main(int argc, char* argv[]){
 		index++;
 	}
 	//print EOF index
-	fprintf(stderr, "COUNTER == %d\n", TEMP);
+	fprintf(stderr, "COUNTER == %zu\n", KEY);
 	int x = 0;
-	unsigned char *c = malloc(sizeof(char) * 4);
-	while(x < 4){
-		c[3-x] = (unsigned char)TEMP;
-		TEMP >>= 8;
+	unsigned char *c = malloc(sizeof(char) * 8);
+	while(x < 8){
+		c[7-x] = (unsigned char)KEY;
+		KEY >>= 8;
 		x++;
 	}
 	x = 0;
 	//temporary makeshift way to print int in the right order as raw char
-	while(x < 4){
+	while(x < 8){
 		fprintf(stdout, "%c", c[x]);
 		x++;
 	}
@@ -101,7 +101,7 @@ int main(int argc, char* argv[]){
 
 //--------------------------------------------------------------------------//
 
-btree_t *InsertNode(btree_t *node, string_t *string, int index){
+btree_t *InsertNode(btree_t *node, string_t *string, size_t index){
 	/* if node is empty assign value to node */
 	if(node == NULL){
 		node = malloc(sizeof(btree_t));
@@ -112,8 +112,8 @@ btree_t *InsertNode(btree_t *node, string_t *string, int index){
 	else{
 		/* comnpare string */
 		int i = 0, j = 0;
-		char entry = string->chars[node->entryindex]; 
-		char chars = string->chars[index];
+		unsigned char entry = string->chars[node->entryindex]; 
+		unsigned char chars = string->chars[index];
 		/* linear search until chars are not the same */
 		while((int)entry == (int)chars){
 			i++;
@@ -146,7 +146,7 @@ btree_t *InsertNode(btree_t *node, string_t *string, int index){
 
 //--------------------------------------------------------------------------//
 
-void CreateNode(btree_t *node, string_t *string, int index){
+void CreateNode(btree_t *node, string_t *string, size_t index){
 	#if DEBUG
 	fprintf(stderr, "creating node for %c\n", string->chars[index]);
 	#endif
@@ -154,7 +154,7 @@ void CreateNode(btree_t *node, string_t *string, int index){
 	node->entry = &string->chars[index];
 	node->left = NULL;
 	node->right = NULL;
-	node->entryindex = (unsigned int) index;
+	node->entryindex = index;
 	/* adjusting string bound output */
 	if(index == 0){
 		EOF_INDEX = index;
@@ -175,11 +175,11 @@ string_t GetString(FILE *in){
 
 	/* initialize memory space for c */	
 	size_t size = sizeof(char);
-	char *c = malloc(size);
+	unsigned char *c = malloc(size);
 	assert(c != NULL);
 
 	/* retrieve char to buffer from in */
-	int i = 0;
+	size_t i = 0;
 	int buffer;
 
 	while((buffer = fgetc(in)) != EOF){
@@ -216,7 +216,7 @@ void PrintTree(btree_t *node){
 		PrintTree(node->left);
 	}
 	if(EOF_INDEX == node->entryindex){
-		TEMP = COUNTER;
+		KEY = COUNTER;
 	}
 	else{
 		COUNTER++;
