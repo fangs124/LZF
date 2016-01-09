@@ -1,5 +1,5 @@
 /* BWTe.c - Burrows Wheeler Transform Decoder */
-/* AUTHORS: Fangs124, darkf                   */
+/* AUTHORS: originally Fangs124, refactored and ported to C++ (i.e. made good) by darkf */
 
 #include <cstdio>
 #include <cstdlib>
@@ -7,24 +7,15 @@
 #include <cstring>
 
 #include <string>
+#include <vector>
 #include <iostream>
 #include <sstream>
 
-typedef struct NODES node_t;
-struct NODES {
+struct Node {
 	unsigned char* data;
 	size_t index;
-	//node_t* next;
-};
 
-struct Bucket {
-	size_t child_count = 0;
-	size_t size = 2;
-	node_t* childs;
-
-	Bucket() {
-		childs = (node_t *)malloc(sizeof(node_t) * size);
-	}
+	Node(unsigned char *data, size_t index) : data(data), index(index) { }
 };
 
 std::string readFile(std::istream& is, size_t& key) {
@@ -58,41 +49,27 @@ int main() {
 	size_t key;
 	std::string string = readFile(std::cin, key);
 
-	Bucket root[256];
+	std::vector<Node> root[256];
 
 	// bucket sort
-	unsigned char c;
 
 	for(size_t index = 0; index < string.size(); index++) {
-		c = string[index];
-		root[c].childs[root[c].child_count].data = (unsigned char*) &string[index];
-		root[c].childs[root[c].child_count].index = index;
-		//root[c].childs[root[c].child_count].next = NULL;
-		root[c].child_count++;
-		if(root[c].child_count == root[c].size){
-			root[c].size *= 2;
-			root[c].childs = (node_t *)realloc(root[c].childs, 
-				sizeof(node_t) * root[c].size);
-			assert(root[c].childs != NULL);
-		}
+		unsigned char c = string[index];
+		root[c].emplace_back((unsigned char*) &string[index], index);
 	}
 
-	size_t index = 0;
-	while(index < string.size()) {
-		c = 0;
-		while(key + 1 > root[c].child_count){
-			key -= root[c].child_count;
+	for(size_t index = 0; index < string.size(); index++) {
+		unsigned char c = 0;
+		while(key + 1 > root[c].size()) {
+			key -= root[c].size();
 			c++;
 		}
 
 		//fprintf(stderr, "%X\n", key);
-		fprintf(stdout, "%c", *root[c].childs[key].data);
-		key = root[c].childs[key].index;
-		c = 0x00;
-		index++;
+		fprintf(stdout, "%c", *root[c][key].data);
+		key = root[c][key].index;
+		c = 0;
 	}
 
-	//fprintf(stderr, "size_t = %zu\n", sizeof(size_t));
-	//fprintf(stderr, "unsigned int = %zu\n", sizeof(unsigned int));
 	return 0;
 }
