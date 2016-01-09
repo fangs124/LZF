@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <string>
 #include <vector>
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <cassert>
@@ -66,9 +67,15 @@ void bwtd_sort(const std::string& string, size_t key) {
 	}
 }
 
-int main() {
+int main(int argc, char **argv) {
+	if(argc != 2) {
+		std::cout << "USAGE: " << argv[0] << " INPUT_FILE" << std::endl;
+		return 1;
+	}
+
+	std::ifstream file(argv[1], std::ios::in | std::ios::binary);
 	size_t key;
-	std::string string = readFile(std::cin, key);
+	auto string = readFile(file, key);
 
 	bwtd_sort(string, key);
 	//bwtd_bucket_sort(string, key);
