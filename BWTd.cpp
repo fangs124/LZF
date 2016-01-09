@@ -1,6 +1,7 @@
 /* BWTe.c - Burrows Wheeler Transform Decoder */
 /* AUTHORS: originally Fangs124, refactored and ported to C++ (i.e. made good) by darkf */
 
+#include <algorithm>
 #include <string>
 #include <vector>
 #include <iostream>
@@ -32,12 +33,9 @@ std::string readFile(std::istream& is, size_t& key) {
     return s;
 }
 
-int main() {
-	size_t key;
-	std::string string = readFile(std::cin, key);
+void bwtd_bucket_sort(const std::string& string, size_t key) {
 	std::vector<size_t> buckets[256];
 
-	// bucket sort
 	for(size_t index = 0; index < string.size(); index++) {
 		buckets[(unsigned char)string[index]].push_back(index);
 	}
@@ -53,6 +51,27 @@ int main() {
 		key = buckets[c][key];
 		c = 0;
 	}
+}
+
+void bwtd_sort(const std::string& string, size_t key) {
+	std::vector<size_t> indices;
+	indices.resize(string.size());
+	std::iota(indices.begin(), indices.end(), 0);
+
+	std::stable_sort(indices.begin(), indices.end(), [=](size_t i, size_t j) { return string[i] < string[j]; });
+
+	for(size_t index = 0; index < string.size(); index++) {
+		std::cout << string[indices[key]];
+		key = indices[key];
+	}
+}
+
+int main() {
+	size_t key;
+	std::string string = readFile(std::cin, key);
+
+	bwtd_sort(string, key);
+	//bwtd_bucket_sort(string, key);
 
 	return 0;
 }
