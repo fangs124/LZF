@@ -58,7 +58,7 @@ void bwtd_sort(const std::string& string, size_t key) {
 	indices.resize(string.size());
 	std::iota(indices.begin(), indices.end(), 0);
 
-	std::stable_sort(indices.begin(), indices.end(), [=](size_t i, size_t j) { return string[i] < string[j]; });
+	std::stable_sort(indices.begin(), indices.end(), [&](size_t i, size_t j) { return string[i] < string[j]; });
 
 	for(size_t index = 0; index < string.size(); index++) {
 		std::cout << string[indices[key]];
