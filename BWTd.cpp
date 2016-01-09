@@ -17,11 +17,14 @@ struct NODES {
 	//node_t* next;
 };
 
-typedef struct BUCKETS bucket_t;
-struct BUCKETS {
-	size_t child_count;
-	size_t size;
+struct Bucket {
+	size_t child_count = 0;
+	size_t size = 2;
 	node_t* childs;
+
+	Bucket() {
+		childs = (node_t *)malloc(sizeof(node_t) * size);
+	}
 };
 
 std::string readFile(std::istream& is, size_t& key) {
@@ -54,26 +57,13 @@ std::string readFile(std::istream& is, size_t& key) {
 int main() {
 	size_t key;
 	std::string string = readFile(std::cin, key);
-	// fprintf(stderr, "%zu\n", string.length);
-	// fprintf(stderr, "%zX\n", string.key);
 
-	/* initialize buckets */
-	bucket_t root[256];
-	size_t index = 0;
+	Bucket root[256];
 
-	while(index <= 255) {
-		root[index].child_count = 0;
-		root[index].size = 2;
-		root[index].childs = (node_t *)malloc(sizeof(node_t) * root[index].size);
-		//fprintf(stderr, "%X", string.chars[index]);
-		index++;
-	}
-
-	/* bucket sort */
-	index = 0;
+	// bucket sort
 	unsigned char c;
 
-	while(index < string.size()) {
+	for(size_t index = 0; index < string.size(); index++) {
 		c = string[index];
 		root[c].childs[root[c].child_count].data = (unsigned char*) &string[index];
 		root[c].childs[root[c].child_count].index = index;
@@ -85,10 +75,9 @@ int main() {
 				sizeof(node_t) * root[c].size);
 			assert(root[c].childs != NULL);
 		}
-		index++;
 	}
 
-	index = 0;
+	size_t index = 0;
 	while(index < string.size()) {
 		c = 0;
 		while(key + 1 > root[c].child_count){
