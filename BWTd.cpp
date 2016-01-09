@@ -34,8 +34,10 @@ std::string readFile(std::istream& is, size_t& key) {
     return s;
 }
 
-void bwtd_bucket_sort(const std::string& string, size_t key) {
+std::string bwtd_bucket_sort(const std::string& string, size_t key) {
 	std::vector<size_t> buckets[256];
+	std::string out;
+	out.resize(string.size());
 
 	for(size_t index = 0; index < string.size(); index++) {
 		buckets[(unsigned char)string[index]].push_back(index);
@@ -48,37 +50,49 @@ void bwtd_bucket_sort(const std::string& string, size_t key) {
 			c++;
 		}
 
-		std::cout << string[buckets[c][key]];
+		out[index] = string[buckets[c][key]];
 		key = buckets[c][key];
 		c = 0;
 	}
+
+	return out;
 }
 
-void bwtd_sort(const std::string& string, size_t key) {
+std::string bwtd_sort(const std::string& string, size_t key) {
 	std::vector<size_t> indices;
 	indices.resize(string.size());
 	std::iota(indices.begin(), indices.end(), 0);
 
+	std::string out;
+	out.resize(string.size());
+
 	std::stable_sort(indices.begin(), indices.end(), [&](size_t i, size_t j) { return string[i] < string[j]; });
 
 	for(size_t index = 0; index < string.size(); index++) {
-		std::cout << string[indices[key]];
+		out[index] = string[indices[key]];
 		key = indices[key];
 	}
+
+	return out;
 }
 
 int main(int argc, char **argv) {
-	if(argc != 2) {
-		std::cout << "USAGE: " << argv[0] << " INPUT_FILE" << std::endl;
+	if(argc != 3) {
+		std::cout << "USAGE: " << argv[0] << " INPUT_FILE OUTPUT_FILE" << std::endl;
 		return 1;
 	}
 
 	std::ifstream file(argv[1], std::ios::in | std::ios::binary);
 	size_t key;
 	auto string = readFile(file, key);
+	file.close();
 
-	bwtd_sort(string, key);
-	//bwtd_bucket_sort(string, key);
+	std::string out = bwtd_sort(string, key);
+	// std::string out = bwtd_bucket_sort(string, key);
+
+	std::ofstream outfile(argv[2], std::ios::out | std::ios::binary);
+	outfile << out;
+	outfile.close();
 
 	return 0;
 }
