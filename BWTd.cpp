@@ -35,22 +35,22 @@ std::string readFile(std::istream& is, size_t& key) {
 int main() {
 	size_t key;
 	std::string string = readFile(std::cin, key);
-	std::vector<size_t> root[256];
+	std::vector<size_t> buckets[256];
 
 	// bucket sort
 	for(size_t index = 0; index < string.size(); index++) {
-		root[(unsigned char)string[index]].push_back(index);
+		buckets[(unsigned char)string[index]].push_back(index);
 	}
 
 	for(size_t index = 0; index < string.size(); index++) {
 		unsigned char c = 0;
-		while(key + 1 > root[c].size()) {
-			key -= root[c].size();
+		while(key + 1 > buckets[c].size()) {
+			key -= buckets[c].size();
 			c++;
 		}
 
-		std::cout << string[root[c][key]];
-		key = root[c][key];
+		std::cout << string[buckets[c][key]];
+		key = buckets[c][key];
 		c = 0;
 	}
 
