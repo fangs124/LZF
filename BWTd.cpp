@@ -1,22 +1,11 @@
 /* BWTe.c - Burrows Wheeler Transform Decoder */
 /* AUTHORS: originally Fangs124, refactored and ported to C++ (i.e. made good) by darkf */
 
-#include <cstdio>
-#include <cstdlib>
-#include <cassert>
-#include <cstring>
-
 #include <string>
 #include <vector>
 #include <iostream>
 #include <sstream>
-
-struct Node {
-	unsigned char* data;
-	size_t index;
-
-	Node(unsigned char *data, size_t index) : data(data), index(index) { }
-};
+#include <cassert>
 
 std::string readFile(std::istream& is, size_t& key) {
 	is.seekg(0, is.end);
@@ -39,23 +28,18 @@ std::string readFile(std::istream& is, size_t& key) {
     	key |= (unsigned char)keybuf[i];
     }
 
-    std::cout << "key: " << key << std::endl;
-
+    std::cerr << "key: " << key << std::endl;
     return s;
 }
-
 
 int main() {
 	size_t key;
 	std::string string = readFile(std::cin, key);
-
-	std::vector<Node> root[256];
+	std::vector<size_t> root[256];
 
 	// bucket sort
-
 	for(size_t index = 0; index < string.size(); index++) {
-		unsigned char c = string[index];
-		root[c].emplace_back((unsigned char*) &string[index], index);
+		root[(unsigned char)string[index]].push_back(index);
 	}
 
 	for(size_t index = 0; index < string.size(); index++) {
@@ -65,9 +49,8 @@ int main() {
 			c++;
 		}
 
-		//fprintf(stderr, "%X\n", key);
-		fprintf(stdout, "%c", *root[c][key].data);
-		key = root[c][key].index;
+		std::cout << string[root[c][key]];
+		key = root[c][key];
 		c = 0;
 	}
 
