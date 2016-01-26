@@ -3,15 +3,43 @@
 /* VERS: 0.1c                                 */
 /* DATE: 9 December, 2015                     */
 
+//--------------------------------------------------------------------------//
+
+/* 
+
+The BWT works by sorting all strings rotation lexicographically,
+where the output is the last characters of all the sorted rotations.
+
+Here a string rotation of length L is defined as string[x+i], where x is
+the starting index of the rotation, and i increments from 0 to L. e.g. 
+let string = "^BANANA", then the string rotations are as follow:
+
+string[0+i] = "^BANANA"
+string[1+i] = "BANANA^"
+string[2+i] = "	ANANA^B"
+and so on...
+
+This program fundementally sorts the rotations by linear comparison iterating
+through the string, and storing its result in a binary tree to reduce the
+number of comparison needed.
+
+In other words, the program will compare string[x+i] with string [j+i],
+where x is the starting index of the currently processed rotation,
+while j is the starting index of the rotation  stored in the current node.
+
+*/
+
 //--------//  preprocessors //----------------------------------------------//
 
+/* libraries */
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <string.h>
 
+/* output control */
 #define DEBUG         0
 
+/* constants */
 #define TRUE          1
 #define FALSE         0
 
@@ -21,7 +49,7 @@ typedef struct BINARYTREES btree_t;
 struct BINARYTREES {
 	unsigned char *entry;
 	size_t entryindex;
-	unsigned char *output;
+	unsigned char *output; // equivalent to string[x-1]
 	btree_t *left;
 	btree_t *right;
 };

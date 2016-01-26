@@ -100,7 +100,6 @@ int main(int argc, char* argv[]){
 
 	/* retrieve data from stdin */
 	while((data_buffer = fgetc(stdin)) != EOF){
-		
 		/* building prefix-tree */
 		bytes_counter++;
 		data = (unsigned char) data_buffer;
@@ -251,6 +250,7 @@ void AddNode(unsigned char in_data){
 void AddDict(node_t *in_node, unsigned int in_index){
 	#if DEBUG
 	{
+		fprintf(stderr, "creating dictionary element:\n", );
 		fprintf(stderr, "%c%d", in_node->data, in_index);
 		fprintf(stderr, "\n");
 	}
