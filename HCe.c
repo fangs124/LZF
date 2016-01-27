@@ -28,11 +28,20 @@ struct NODES {
 
 typedef struct TABLES table_t;
 struct TABLES {
-	unsigned char data;
 	unsigned char* binary_sequence;
 };
 
+typedef struct LISTS list_t;
+struct LISTS {
+	unsigned char data;
+	list_t *prev;
+	list_t *next;
+};
+
+table_t* GenerateTable(node_t* root);
 int CompareFrequency(const void* a, const void* b);
+
+table_t TABLE[256];
 
 int main(int argc, char* argv[]){
 	/* initialize counter */
@@ -126,7 +135,6 @@ int main(int argc, char* argv[]){
 		node->parent = NULL;
 		node->child = NULL;
 		node->left = temp->node; //link them together
-		//fprintf(stderr, "here3\n");
 		temp->node->parent = node;
 		node->right = current->node;
 		current->node->parent = node;
@@ -191,6 +199,7 @@ int main(int argc, char* argv[]){
 	fprintf(stderr, "lowest_freq = %u\nchar: %02X %c\n", lowest_freq, l_c, l_c);
 	
 	/* generate huffman table */
+	node_t* root = node;
 
 	
 	//what to do with the huffman tree now..
@@ -198,6 +207,49 @@ int main(int argc, char* argv[]){
 
 	/* output */
 	return 0;
+}
+
+table_t* GenerateTable(node_t* root){
+
+}
+
+void TraverseTree(node_t* node, list_t* list){
+	if(node->child != NULL){
+		unsigned int length = 0;
+		unsigned int i;
+		unsigned char index = *node->child->data;
+		list_t* ptr;
+		for(ptr = list; ptr->prev != NULL; ptr = ptr->prev){
+			length++;
+		}
+		TABLE[index].binary_sequence = (char*) malloc(sizeof(char) * (length+1));
+		TABLE[index].binary_sequence[length] = '\0';
+		for(i = 0; i < length; i++){
+			TABLE[index].binary_sequence[i] = ptr->data;
+			ptr = ptr->next;
+		}
+	}
+
+	else{
+		if(list == NULL){
+			list = (list_t*) malloc(sizeof(list_t));
+			list->prev = NULL
+		}
+		list->next = (list_t*) malloc(sizeof(list_t));
+		list->next->prev = list;
+		list->next->next = NULL;
+		if(node->left != NULL){
+			list->data = 0x0A;
+			TraverseTree(node->left, list->next);
+		}
+		if(node->right != NULL){
+			list->data = 0x0B;
+			TraverseTree(node->right, list->next);
+		}
+		free(list->next);
+		list->next = NULL;
+	}
+	return;
 }
 
 int CompareFrequency(const void* a, const void* b){
