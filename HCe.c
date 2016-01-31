@@ -220,20 +220,22 @@ int main(int argc, char* argv[]){
 	for(i = 0x00; i <= 0xFF; i++){
 		if(TABLE[i].sequence != NULL){
 			factor_count++;
-			fprintf(stderr, "char: %c (%02X)\nsequence: ", 
-				(unsigned char) i, i);
+			//fprintf(stderr, "char: %c (%02X)\nsequence: ", 
+			//	(unsigned char) i, i);
 			j = 0x00;
 			while(TABLE[i].sequence[j] != '\0'){
 				TABLE[i].bits++;
+				/*
 				if(TABLE[i].sequence[j] == 0x0A){
 					fprintf(stderr, "0");
 				}
 				else if(TABLE[i].sequence[j] == 0x0B){
 					fprintf(stderr, "1");
 				}
+				*/
 				j++;
 			}
-			fprintf(stderr, "\nlength: %u\n", TABLE[i].bits);
+			//fprintf(stderr, "\nlength: %u\n", TABLE[i].bits);
 		}
 	}
 
@@ -253,12 +255,14 @@ int main(int argc, char* argv[]){
 		}
 		length_search++;
 	}
+	/*
 	fprintf(stderr, "-----------------------\n");
 	for(i = 0x00; i < factor_count; i++){
 		fprintf(stderr, "char: %c (%02X)\n", dictionary[i].data, dictionary[i].data);
 		fprintf(stderr, "sequence length: %u\n", dictionary[i].length);
 	}
 	fprintf(stderr, "-----------------------\n");
+	*/
 	/* output */
 	//first 4byte : number of factors for the dictionary
 	unsigned int factor_copy = factor_count;
@@ -328,6 +332,7 @@ int main(int argc, char* argv[]){
 			x++;
 		}
 	}
+	/* next 4 bytes: number of chars encoded */
 	/* print the file */
 	rewind(stdin);
 	unsigned char c_index = 0x00;
