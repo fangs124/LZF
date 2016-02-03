@@ -55,8 +55,12 @@ table_t TABLE[256];
 int main(int argc, char* argv[]){
 	/* initialize counter */
 	bucket_t counter[256];
+	bucket_t backup[256];
 	size_t index = 0x00;
 	while(index <= 0xFF){
+		backup[index].data = (unsigned char) index;
+		backup[index].count = 0;
+		backup[index].parent = NULL;
 		counter[index].data = (unsigned char) index;
 		counter[index].count = 0;
 		counter[index].parent = NULL;
@@ -66,11 +70,12 @@ int main(int argc, char* argv[]){
 	}
 
 	/* count byte frequency */
-	int buffer;
+	unsigned int buffer;
 	unsigned char c;
 	while((buffer = fgetc(stdin)) != EOF){
 		c = (unsigned char) buffer;
 		counter[c].count++;
+		backup[c].count++;
 	}
 
 	/* sort the array */
@@ -86,19 +91,21 @@ int main(int argc, char* argv[]){
 	unsigned int elements = 0;
 	for(index = 0x00; index <= 0xFF; index++){
 		if(counter[index].count != 0){
-			//
-			if(lowest_freq == 0){
-				lowest_freq = counter[index].count;
-				l_c = counter[index].data;
-			}
-			else if(lowest_freq > counter[index].count){
-				lowest_freq = counter[index].count;
-				h_c = counter[index].data;
-			}
-			if(highest_freq <= counter[index].count){
-				highest_freq = counter[index].count;
-				h_c = counter[index].data;
-			}
+			/*
+			t {
+
+				if(lowest_freq == 0){
+					lowest_freq = counter[index].count;
+					l_c = counter[index].data;
+				}
+				else if(lowest_freq > counter[index].count){
+					lowest_freq = counter[index].count;
+					h_c = counter[index].data;
+				}
+				if(highest_freq <= counter[index].count){
+					highest_freq = counter[index].count;
+					h_c = counter[index].data;
+			}/*
 			//
 			elements++;
 			total += counter[index].count;
@@ -255,14 +262,22 @@ int main(int argc, char* argv[]){
 		}
 		length_search++;
 	}
-	/*
+
+	unsigned long total_bits = 0;
+	
 	fprintf(stderr, "-----------------------\n");
+	fprintf(stderr, "factor_count: %u\n\n\n", factor_count);
 	for(i = 0x00; i < factor_count; i++){
-		fprintf(stderr, "char: %c (%02X)\n", dictionary[i].data, dictionary[i].data);
+		total_bits += (backup[dictionary[i].data].count * dictionary[i].length);
+		fprintf(stderr, "char: (%02X)\n", dictionary[i].data);
+		fprintf(stderr, "frequency: %u\n", backup[dictionary[i].data].count);
 		fprintf(stderr, "sequence length: %u\n", dictionary[i].length);
 	}
+	fprintf(stderr, "total bits: %lu\n", total_bits);
+	fprintf(stderr, "total bytes:~ %lu\n", total_bits/8);
+	
 	fprintf(stderr, "-----------------------\n");
-	*/
+	
 	/* output */
 	//first 4byte : number of factors for the dictionary
 	unsigned int factor_copy = factor_count;
@@ -318,6 +333,8 @@ int main(int argc, char* argv[]){
 			else{
 
 			}
+			char_buffer <<= 1;
+			x++;
 			if(shifts != 7){
 				c <<= 1;
 				shifts++;
@@ -328,8 +345,6 @@ int main(int argc, char* argv[]){
 				shifts = 0;
 
 			}
-			char_buffer <<= 1;
-			x++;
 		}
 	}
 	/* next 4 bytes: number of chars encoded */
@@ -338,7 +353,7 @@ int main(int argc, char* argv[]){
 	unsigned char c_index = 0x00;
 	while((buffer = fgetc(stdin)) != EOF){
 		c_index = (unsigned char) buffer;
-		//fprintf(stderr, "here\n");
+		fprintf(stderr, "printing char: %02X\n", c_index);
 		c_ptr = TABLE[c_index].sequence;
 		j = 0;
 		while(c_ptr[j] != '\0'){
@@ -422,7 +437,7 @@ int CompareFrequency(const void* a, const void* b){
 	bucket_t left = *(bucket_t*) a;
 	bucket_t right = *(bucket_t*) b;
 	if(left.count == right.count){
-		return (int) ((unsigned int) left.data - (unsigned int) right.data);
+		return (int) ((unsigned char) left.data - (unsigned char) right.data);
 	}
 	else{
 		return (int) (left.count - right.count);
