@@ -31,18 +31,18 @@ struct NODES { //huffman tree nodes
 	count_t* child;
 	node_t* left;
 	node_t* right;
-}
+};
 
 struct TABLES {
 	unsigned char* sequence;
 	unsigned int bits;
-}
+};
 
 struct LINKEDLIST {
 	unsigned char data;
 	list_t* prev;
 	list_t* next;
-}
+};
 //--------//
 //--------//
 
@@ -239,12 +239,9 @@ table_t* GenerateHuffTable(node_t* root, table_t* huff_table){
 
 void TraverseTree(node_t* node, list_t* list, table_t* huff_table){
 	if(node->child != NULL){
+		/* set char sequence for found alphabet */
 		unsigned char index = node->child->data;
-		huff_table[index].sequence = FindSequence(index, list, huff_table);
-		//base case, end reccursion 
-		//count length of sequence
-		//create table element
-		/* find char index */
+		huff_table[index].sequence = FindSequence(list);
 	}
 
 	else{ //traverse tree
@@ -262,7 +259,7 @@ void TraverseTree(node_t* node, list_t* list, table_t* huff_table){
 	return;
 }
 
-char* FindSequence(unsigned char index, list_t* last, table_t* huff_table){
+char* FindSequence(list_t* last){
 	unsigned int length = 0;
 	unsigned int i;
 	unsigned char* sequence;
@@ -270,13 +267,13 @@ char* FindSequence(unsigned char index, list_t* last, table_t* huff_table){
 	for(ptr = last; ptr->prev != NULL; ptr = ptr->prev){
 		length++;
 	}
-	sequence = (unsigned char*) malloc(sin  zeof(char) * (length+1));
+	sequence = (unsigned char*) malloc(sizeof(char) * (length+1));
 	sequence[length] = '\0';
 	for(i = 0; i < length; i++){
-		sequence[i] = ptr->data;
+		sequence[i] = (unsigned char) ptr->data;
 		ptr = ptr->next;
 	}
-
+	return sequence;
 }
 
 
