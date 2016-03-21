@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # Rain cloud tracking program
 # Calculates potential collision of rain with input location
-# Mike Mews 2016
+# -personal info REMOVED-
 
 import os
 import glob
