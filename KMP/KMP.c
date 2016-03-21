@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-
-
+#define NMEMB 4096
+#define BYTESIZE 1
 //--------------------------------------------------------------------------//
 
 typedef struct TABLES table_t;
@@ -52,7 +52,6 @@ table_t *GenerateTable(unsigned int size, char* string){
 	table->value = malloc(size);
 	assert(table->value != NULL);
 
-	char* substring = &string[0];
 	unsigned int i;
 	unsigned int j = 0;
 	//int value = 0;
@@ -62,7 +61,7 @@ table_t *GenerateTable(unsigned int size, char* string){
 	for(i = 1; i < size; i++){
 		table->value[i] = j;
 		
-		if(string[i] == substring[j]){
+		if(string[i] == string[j]){
 			j++;
 		}
 		
@@ -77,32 +76,15 @@ table_t *GenerateTable(unsigned int size, char* string){
 
 string_t GetString(FILE *in){
 	/* initialize memory space for c */	
-	unsigned int size = sizeof(char);
-	char *c = malloc(size);
+	char *c = malloc(BYTESIZE*NMEMB);
 	assert(c != NULL);
-
-	/* retrieve char to buffer from in */
-	unsigned int i = 0;
-	int buffer;
-
-	while((buffer = fgetc(in)) != EOF){
-		c[i] = (char) buffer;
-		i++;
-
-		/* extend c if needed */
-		if(size == i){
-			size *= 2;
-			c = realloc(c, size);
-			assert(c != NULL);
-		}
-	}
-	/* trimming memory space for c */
-	c = realloc(c, (sizeof(char)*(i+1)));
-	c[i] = '\0';
+	size_t size = fread(c, BYTESIZE, NMEMB, in);
+	c = realloc(c, (BYTESIZE*(size+1)));
+	c[size] = '\0';
 
 	/* creating string and returns */
 	string_t string;
 	string.chars = c;
-	string.size = i;
+	string.size = size;
 	return string;
 }
