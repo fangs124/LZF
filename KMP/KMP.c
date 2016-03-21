@@ -3,6 +3,7 @@
 #include <assert.h>
 #define NMEMB 4096
 #define BYTESIZE 1
+#define GRAPHS 0
 //--------------------------------------------------------------------------//
 
 typedef struct TABLES table_t;
@@ -26,9 +27,9 @@ string_t GetString(FILE *in);
 int main(int argc, char* argv[]){
 	string_t string = GetString(stdin);
 	table_t *table = GenerateTable(string.size, string.chars);
-	
+	#if GRAPHS
 	unsigned int index = 0;
-	while(index < table->size){
+	while(index < t able->size){
 		fprintf(stderr, "|%2c ", table->data[index]);
 		index++;
 	}
@@ -39,6 +40,7 @@ int main(int argc, char* argv[]){
 		index++;
 	}
 	fprintf(stderr, "|\n");
+	#endif
 	return 0;
 }
 
