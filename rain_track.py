@@ -2,7 +2,7 @@
 # Rain cloud tracking program
 # Calculates potential collision of rain with input location
 # -personal info REMOVED-
-
+##written in python 2.7
 import os
 import glob
 import time
