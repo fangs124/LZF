@@ -1,3 +1,4 @@
+#only shows motion from camera
 from SimpleCV import *
 
 cam = Camera()
