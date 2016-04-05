@@ -9,7 +9,8 @@ STUDENTID = <STUDENT-ID>
 SUBMIT	= toposort.c graph.c graphio.c report.pdf
 
 # Define the C compiler
-CC      = gcc
+#CC      = gcc
+CC      = gcc-5
 
 # Define the compiler flags
 #  -Wall to turn on most of the warnings

@@ -1,4 +1,4 @@
-/* LZ78e.c - LZ78 Universal Encoder */
+ /* LZ78e.c - LZ78 Universal Encoder */
 /* warning: botch code              */
 /* by: Fangs124                     */
 //--------//  preprocessors //----------------------------------------------//
