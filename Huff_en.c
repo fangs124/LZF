@@ -95,9 +95,11 @@ int main(int argc, char* argv[]){
 	
 	que_t *que_ptr = priority_q;
 	int loop_condition = 1;
+	unsigned int symbols = 0;
 	while(loop_condition){
-		fprintf((stderr), "node->child->data  = %02X\n", que_ptr->node->child->data);
-		fprintf((stderr), "count  = %u\n", que_ptr->count);
+		symbols++;
+		//fprintf((stderr), "node->child->data  = %02X\n", que_ptr->node->child->data);
+		//fprintf((stderr), "count  = %u\n", que_ptr->count);
 		if(que_ptr->next == NULL){
 			loop_condition--;
 		}
@@ -134,7 +136,7 @@ int main(int argc, char* argv[]){
 	}
 
 	fprintf(stderr, "---end of table ---\n");
-
+	fprintf(stderr, "symbols = %d\n", symbols);
 	return 0;
 }
 
@@ -282,10 +284,11 @@ node_t* GenerateTree(que_t* priority_q, unsigned int* total){
 	que_t* que_ptr2; //prev
 	node_t* root;
 
-	while(priority_q->count != *total){//work with stack
+	while(priority_q->next->next != NULL){//work with stack
 		/* take two elements from que and combine them */
 		que_ptr2 = priority_q;
-		que_ptr1 = priority_q->next; //need to check bound here
+		que_ptr1 = priority_q->next;
+		priority_q = priority_q->next->next; //need to check bound here
 		if(que_ptr1 == NULL){
 			fprintf(stderr, "que_ptr1 == NULL\n");
 		}
@@ -298,17 +301,19 @@ node_t* GenerateTree(que_t* priority_q, unsigned int* total){
 		/*if(que_ptr2->node == NULL){
 			fprintf(stderr, "que_ptr2->node == NULL\n");
 		}*/
-		fprintf(stderr, "here1\n");
+		//fprintf(stderr, "here1\n");
 		root = CreateCombinedNode(que_ptr1->node, que_ptr2->node);
-		fprintf(stderr, "here2\n");
+		//fprintf(stderr, "here2\n");
 		que_ptr1 = CreateNewElement(que_ptr1, que_ptr2, root);
+		//fprintf(stderr, "here3\n");
 		/* create new que elements for the new node */
 		if(priority_q->node == NULL){
 			fprintf(stderr, "priority_q->node == NULL\n");
 		}
-		
+		//fprintf(stderr, "here4\n");
 		/* insert new element to the priority que */
 		InsertNewElement(priority_q, que_ptr1);
+		//fprintf(stderr, "here5\n");
 		//que_ptr1 = priority_q;
 		
 	}
